@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>File and Folder Upload/Download</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-form, .files-list {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .file-input {
+            margin: 10px 0;
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .files-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .files-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .files-list li a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .files-list li a:hover {
+            text-decoration: underline;
+        }
+        .server-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .folder-structure {
+            padding-left: 20px;
+        }
+        .folder-name {
+            font-weight: bold;
+            color: #666;
+        }
+        .upload-instructions {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .folder-item {
+            margin-bottom: 15px;
+        }
+        .folder-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .download-btn {
+            background-color: #2196F3;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .download-btn:hover {
+            background-color: #1976D2;
+            text-decoration: none;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>File and Folder Upload/Download</h1>
+    
+    
+
+    <div class="upload-form">
+        <h2>Upload Files or Folders</h2>
+        <p class="upload-instructions" style="color: #ff6b6b;">Maximum limit: 500,000 files per upload</p>
+        <form method="post" enctype="multipart/form-data" action="/upload-folder">
+            <div class="file-input">
+                <input type="file" name="files[]" webkitdirectory mozdirectory>
+                <p class="upload-instructions">Click to select an entire folder</p>
+            </div>
+            <div class="file-input">
+                <input type="file" name="files[]" multiple>
+                <p class="upload-instructions">Or select individual files</p>
+            </div>
+            <input type="submit" value="Upload" class="submit-btn">
+        </form>
+    </div>
+
+    <div class="files-list">
+        <h2>Available Files and Folders</h2>
+        <div class="folder-structure">
+            {% for item in file_structure %}
+                {% if item.type == 'folder' %}
+                    <div class="folder-item">
+                        <div class="folder-header">
+                            <span class="folder-name">📁 {{ item.name }}/</span>
+                            <a href="{{ url_for('download_folder', folder_name=item.name) }}" class="download-btn">
+                                📥 Download Folder
+                            </a>
+                        </div>
+                        <ul>
+                        {% for file in item.files %}
+                            <li>
+                                <a href="{{ url_for('uploaded_file', folder=item.name, filename=file) }}" target="_blank">{{ file }}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <div>
+                        <a href="{{ url_for('uploaded_file', filename=item.name) }}" target="_blank">{{ item.name }}</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+  </body>
+</html>
